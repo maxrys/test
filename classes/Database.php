@@ -16,20 +16,29 @@ abstract class Database {
 
     static function init($credentials) {
         try {
-            static::$connection = new PDO(
-                $credentials['driver'  ].':host='.
-                $credentials['host'    ].';port='.
-                $credentials['port'    ].';dbname='.
-                $credentials['database'].';charset=utf8',
-                $credentials['login'   ],
-                $credentials['password']
-            );
+            if ($credentials['driver'] === 'mysql') {
+                static::$connection = new PDO(
+                    $credentials['driver'  ].':host='.
+                    $credentials['host'    ].';port='.
+                    $credentials['port'    ].';dbname='.
+                    $credentials['database'].';charset=utf8',
+                    $credentials['login'   ],
+                    $credentials['password']
+                );
+            }
+            if ($credentials['driver'] === 'sqlite') {
+                static::$connection = new PDO(
+                    $credentials['driver'].':'.
+                    $credentials['file'  ]
+                );
+            }
             return true;
         } catch (Exception $e) {
-            return [
-                'message' => $e->getMessage(),
-                'code'    => $e->getCode()
-            ];
+            print json_encode([
+                'error'      => $e->getMessage(),
+                'error_code' => $e->getCode()
+            ]);
+            exit();
         }
     }
 
@@ -37,14 +46,22 @@ abstract class Database {
         return static::$connection instanceof PDO;
     }
 
-    static function get_query_result($query, $args = [], $col_num = null) { # @return: array | null
-        $statement = static::$connection->prepare($query);
-        if ($statement instanceof PDOStatement) {
-            $statement->execute($args);
-            if ($statement->errorInfo()[0] === PDO::ERR_NONE) {
-                if ($col_num !== null) return $statement->fetchColumn($col_num);
-                if ($col_num === null) return $statement->fetchAll();
+    static function get_query_result($query, $args = [], $col_num = null) {
+        try {
+            $statement = static::$connection->prepare($query);
+            if ($statement instanceof PDOStatement) {
+                $statement->execute($args);
+                if ($statement->errorInfo()[0] === PDO::ERR_NONE) {
+                    if ($col_num !== null) return $statement->fetchColumn($col_num);
+                    if ($col_num === null) return $statement->fetchAll();
+                }
             }
+        } catch (Exception $e) {
+            print json_encode([
+                'error'      => $e->getMessage(),
+                'error_code' => $e->getCode()
+            ]);
+            exit();
         }
     }
 

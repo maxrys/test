@@ -6,18 +6,13 @@
 
 namespace my_test;
 
-use const my_test\DB_PDO_CREDENTIALS;
+use const my_test\DB_PDO_CREDENTIALS_MYSQL;
+use const my_test\DB_PDO_CREDENTIALS_SQLITE;
 
 require_once('data/credentials.php');
 require_once('classes/Database.php');
 require_once('classes/User.php');
 
-$db_init_result = Database::init(
-    DB_PDO_CREDENTIALS
+Database::init(
+    DB_PDO_CREDENTIALS_SQLITE
 );
-
-if (is_array($db_init_result) && isset($db_init_result['message'])) {
-    print 'Cannot connect to database: ';
-    print $db_init_result['message'];
-    exit();
-}
