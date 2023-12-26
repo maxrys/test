@@ -12,9 +12,9 @@ abstract class User {
 
     static function get_all_uid() {
         # find all possible users by payments
-        $query = 'SELECT DISTINCT `paid_to` as `uid` FROM `transactions`'.
-           'UNION SELECT DISTINCT `paid_by` as `uid` FROM `transactions`'.
-           'ORDER BY `uid`';
+        $query = 'SELECT DISTINCT `paid_to` as `uid` FROM `transactions` UNION '.
+                 'SELECT DISTINCT `paid_by` as `uid` FROM `transactions`'.
+                 'ORDER BY `uid`';
         return Database::get_query_result($query);
     }
 
