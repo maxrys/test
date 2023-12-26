@@ -6,9 +6,9 @@
 
 namespace my_test;
 
+use Exception;
 use PDO;
 use PDOStatement;
-use Exception;
 
 abstract class Database {
 
@@ -34,11 +34,9 @@ abstract class Database {
             }
             return true;
         } catch (Exception $e) {
-            print json_encode([
-                'error'      => $e->getMessage(),
-                'error_code' => $e->getCode()
-            ]);
-            exit();
+            Output::print_json_and_exit(
+                $e->getMessage().' | '.$e->getCode(), Output::EXIT_STATE_ERROR
+            );
         }
     }
 
@@ -54,14 +52,12 @@ abstract class Database {
                 if ($statement->errorInfo()[0] === PDO::ERR_NONE) {
                     if ($col_num !== null) return $statement->fetchColumn($col_num);
                     if ($col_num === null) return $statement->fetchAll();
-                }
-            }
+                } else throw new Exception('pdo execute error');
+            }     else throw new Exception('pdo prepare error');
         } catch (Exception $e) {
-            print json_encode([
-                'error'      => $e->getMessage(),
-                'error_code' => $e->getCode()
-            ]);
-            exit();
+            Output::print_json_and_exit(
+                $e->getMessage().' | '.$e->getCode(), Output::EXIT_STATE_ERROR
+            );
         }
     }
 

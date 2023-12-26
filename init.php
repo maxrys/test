@@ -12,6 +12,7 @@ use const my_test\DB_PDO_CREDENTIALS_SQLITE;
 require_once('data/credentials.php');
 require_once('classes/Database.php');
 require_once('classes/User.php');
+require_once('classes/Output.php');
 
 Database::init(
     DB_PDO_CREDENTIALS_SQLITE
